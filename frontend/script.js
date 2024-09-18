@@ -12,7 +12,7 @@ function sendMessage() {
   if (!userInput) return;
 
   // Display user message
-  addMessageToChat("You: " + userInput, "user");
+  addMessageToChat(userInput, "user");
 
   // Clear input field
   document.getElementById("user-input").value = "";
@@ -28,11 +28,12 @@ function sendMessage() {
     .then((response) => response.json())
     .then((data) => {
       // Display bot response
-      addMessageToChat("Bot: " + data.response, "bot");
+      console.log(data.response);
+      addMessageToChat(data.response, "bot");
     })
     .catch((error) => {
       console.error("Error:", error);
-      addMessageToChat("Bot: Error occurred", "bot");
+      addMessageToChat("Error occurred", "bot");
     });
 }
 
@@ -40,7 +41,14 @@ function addMessageToChat(message, type) {
   const chatBox = document.getElementById("chat-box");
   const messageElement = document.createElement("div");
   messageElement.classList.add("message", type);
-  messageElement.textContent = message;
+  if (type === "bot") {
+    messageElement.innerHTML = marked.parse(message);
+    messageElement.querySelectorAll("pre code").forEach((block) => {
+      hljs.highlightElement(block);
+    });
+  } else {
+    messageElement.textContent = message;
+  }
   chatBox.appendChild(messageElement);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
